@@ -18,9 +18,18 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 ADMIN_ID = os.getenv("ADMIN_ID", "")
+
+STREAM_BASE_URL = os.getenv(
+    "STREAM_BASE_URL",
+    "https://telegram-video-stream-bot.onrender.com"
+).rstrip("/")
+
+STREAM_TOKEN = os.getenv("STREAM_TOKEN", "")
+
 
 
 def is_admin(update: Update) -> bool:
