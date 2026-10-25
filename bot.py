@@ -94,10 +94,13 @@ async def help_command(
     )
 
 
+
 async def receive_video(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ):
+    from urllib.parse import urlencode
+
     message = update.effective_message
 
     if not is_admin(update):
@@ -108,8 +111,13 @@ async def receive_video(
 
     if not CHANNEL_ID:
         await message.reply_text(
-            "⚠️ CHANNEL_ID सेट नहीं है। Render में "
-            "Environment Variables जाँचें।"
+            "⚠️ CHANNEL_ID सेट नहीं है। Render में Environment Variables जाँचें।"
+        )
+        return
+
+    if not STREAM_TOKEN:
+        await message.reply_text(
+            "⚠️ STREAM_TOKEN सेट नहीं है। Render में Environment Variables जाँचें।"
         )
         return
 
@@ -135,23 +143,27 @@ async def receive_video(
             or "Video"
         )
 
+        message_id = saved_message.message_id
+        query = urlencode({"token": STREAM_TOKEN})
+
+        stream_link = (
+            f"{STREAM_BASE_URL}/video/{message_id}?{query}"
+        )
+        download_link = stream_link + "&download=true"
+
         await message.reply_text(
             "✅ वीडियो Private Channel में सेव हो गया!\n\n"
             f"🎬 नाम: {video_name[:200]}\n"
-            f"🆔 Saved Message ID: {saved_message.message_id}\n\n"
-            "▶️ Player Link: अभी सेटअप नहीं हुआ है।\n"
-            "📥 Download Link: अभी सेटअप नहीं हुआ है।\n\n"
-            "अगला चरण: Streaming Backend सेटअप करना।"
+            f"🆔 Saved Message ID: {message_id}\n\n"
+            f"▶️ Stream Link:\n{stream_link}\n\n"
+            f"📥 Download Link:\n{download_link}"
         )
 
     except Exception:
         logger.exception("Video save failed")
         await message.reply_text(
-            "❌ वीडियो सेव नहीं हो सका।\n\n"
-            "कृपया जाँचें:\n"
-            "1. CHANNEL_ID सही है।\n"
-            "2. Bot Private Channel में Admin है।\n"
-            "3. Bot को Channel में पोस्ट करने की अनुमति है।"
+            "❌ वीडियो सेव नहीं हो सका।\n"
+            "Render Logs में error जाँचें।"
         )
 
 
