@@ -1,4 +1,4 @@
-
+from fastapi import Header
 import os
 import math
 import mimetypes
@@ -63,7 +63,7 @@ async def video(
     message_id: int,
     token: str = Query(...),
     download: bool = False,
-    range_header: str | None = None,
+    range_header: str | None = Header(default=None, alias="Range"),
 ):
     if not STREAM_TOKEN or token != STREAM_TOKEN:
         raise HTTPException(status_code=403, detail="Forbidden")
